@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 React Boilerplate
 =====================
 
@@ -42,3 +43,6 @@ npm run lint
 * Webpack
 * [babel-loader](https://github.com/babel/babel-loader)
 * [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+=======
+# Chattyapp
+>>>>>>> 93bccf79f2b5a2f6b28152d16f3a0b9a90bef58f

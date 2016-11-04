@@ -2,6 +2,7 @@
 
 const express = require('express');
 const SocketServer = require('ws').Server;
+const uuid = require('uuid');
 
 // Set the port to 4000
 const PORT = 4000;
@@ -22,13 +23,45 @@ wss.broadcast = function broadcast(data) {
   });
 };
 
+var usersOnline = 0;
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
-  ws.on('message', function incoming(message) {
-    wss.broadcast(message);
-    console.log(message);
-  })
+  usersOnline += 1;
 
-  ws.on('close', () => console.log('Client disconnected'));
+  wss.broadcast(JSON.stringify({
+    type: 'userCount',
+    data: {
+      usersOnline: usersOnline
+    }
+  }))
+
+  ws.on('message', function incoming(message) {
+
+    var tempMessage = JSON.parse(message);
+
+    if (tempMessage["type"] === 'postMessage') {
+      tempMessage["type"]='incomingMessage';
+    } else if (tempMessage["type"] === 'postNotification') {
+      tempMessage["type"]='incomingNotification';
+    } else {
+      tempMessage["type"]='UNKNOWN_TYPE';
+    }
+
+    var newMessage = JSON.stringify(tempMessage);
+
+    wss.broadcast(newMessage);
+    }
+  )
+
+  ws.on('close', () => {
+    usersOnline -= 1;
+    wss.broadcast(JSON.stringify({
+      type: 'userCount',
+      data: {
+        usersOnline: usersOnline
+      }
+    }));
+    console.log('Client disconnected')
+  });
 });
